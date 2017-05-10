@@ -95,8 +95,19 @@ class Perceptron(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        # Write your code to update the weights of the perceptron here
-        pass
+
+        for i in range(0, len(input)):
+
+            sum = 0
+            for j in range(0, len(error)):
+                sum+= error[j]*input[i][j]
+
+            self.weights[i] = self.weights[i] + self.learningRate*sum
+
+
+
+
+
          
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
