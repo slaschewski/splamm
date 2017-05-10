@@ -56,9 +56,18 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        
-        # Write your code to train the perceptron here
-        pass
+        for i in range(0,self.epochs):
+            targets = np.array(self.trainingSet.label)
+            inputs = np.array(self.trainingSet.input)
+            outputs = self.evaluate(inputs)
+
+            errors = outputs - targets
+
+            self.updateWeights(inputs, errors)
+
+
+
+
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -72,8 +81,9 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        # Write your code to do the classification on an input image
-        pass
+
+        return self.fire(testInstance)==1
+
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -92,20 +102,19 @@ class Perceptron(Classifier):
             test = self.testSet.input
         # Once you can classify an instance, just use map for all of the test
         # set.
+
+
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
 
-        for i in range(0, len(input)):
-
+        for i in range(1, len(self.weight)):
+            print i
             sum = 0
-            for j in range(0, len(error)):
-                sum+= error[j]*input[i][j]
+            for j in range(1, len(error)):
+                sum+= error[j]*(input[i])[j]
 
-            self.weights[i] = self.weights[i] + self.learningRate*sum
-
-
-
+            self.weight[i] = self.weight[i] + self.learningRate*sum
 
 
          
