@@ -56,16 +56,32 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        for i in range(0,self.epochs):
-            targets = np.array(self.trainingSet.label)
+        for i in range(self.epochs):
+            targets = []
+            for target in self.trainingSet.label:
+                if target == 7:
+                    targets.append(True)
+                else:
+                    targets.append(False)
+
+            targets = np.array(targets)
+
             inputs = np.array(self.trainingSet.input)
             outputs = self.evaluate(inputs)
 
-            errors = outputs - targets
+            errors = []
+
+            for j in range(len(targets)):
+                if outputs[j] == targets[j]:
+                    errors.append(0)
+                elif outputs[j]:
+                    errors.append(1)
+                else:
+                    errors.append(-1)
+
+            out = self.weight , errors
 
             self.updateWeights(inputs, errors)
-
-
 
 
 
@@ -108,13 +124,12 @@ class Perceptron(Classifier):
 
     def updateWeights(self, input, error):
 
-        for i in range(1, len(self.weight)):
-            print i
+        for i in range(len(self.weight)):
             sum = 0
-            for j in range(1, len(error)):
-                sum+= error[j]*(input[i])[j]
-
-            self.weight[i] = self.weight[i] + self.learningRate*sum
+            for j in range(len(error)):
+                sum += error[j] * input[j][i]
+            print sum
+            self.weight[i] -= self.learningRate * sum
 
 
          
