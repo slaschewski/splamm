@@ -7,6 +7,7 @@ import numpy as np
 
 from util.activation_functions import Activation
 from model.classifier import Classifier
+from report.evaluator import Evaluator
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -59,7 +60,7 @@ class Perceptron(Classifier):
         for i in range(self.epochs):
             targets = []
             for target in self.trainingSet.label:
-                if target == 7:
+                if target == 1:
                     targets.append(True)
                 else:
                     targets.append(False)
@@ -79,10 +80,13 @@ class Perceptron(Classifier):
                 else:
                     errors.append(-1)
 
-            out = self.weight , errors
 
             self.updateWeights(inputs, errors)
 
+            if verbose:
+                validation = self.evaluate(self.validationSet)
+                evaluator = Evaluator()
+                evaluator.printAccuracy(self.validationSet, validation)
 
 
     def classify(self, testInstance):
@@ -97,8 +101,7 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-
-        return self.fire(testInstance)==1
+        return self.fire(testInstance)
 
 
     def evaluate(self, test=None):
@@ -128,7 +131,7 @@ class Perceptron(Classifier):
             sum = 0
             for j in range(len(error)):
                 sum += error[j] * input[j][i]
-            print sum
+            #print sum
             self.weight[i] -= self.learningRate * sum
 
 
