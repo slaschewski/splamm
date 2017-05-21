@@ -50,7 +50,7 @@ class Perceptron(Classifier):
         
         for x in range(0,len(self.traningSet) - 1)
          
-         fori in range(0, len(self.weight) - 1)
+         for(i) in range(0, len(self.weight) - 1)
           self.weight[x] = 
 
     def train(self, verbose=True):
