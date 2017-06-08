@@ -92,7 +92,8 @@ class LogisticRegression(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, grad):
-        pass
+    	  self.weight = self.weight + self.learningRate * grad
+        #pass
 
     def fire(self, input):
         # Look at how we change the activation function here!!!!
