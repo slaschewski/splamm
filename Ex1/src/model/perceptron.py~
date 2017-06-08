@@ -5,8 +5,6 @@ import logging
 
 import numpy as np
 
-import math
-
 from util.activation_functions import Activation
 from model.classifier import Classifier
 
