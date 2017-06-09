@@ -7,6 +7,7 @@ import numpy as np
 
 from util.activation_functions import Activation
 from model.classifier import Classifier
+from report.evaluator import Evaluator
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -56,9 +57,37 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        
-        # Write your code to train the perceptron here
-        pass
+        for i in range(self.epochs):
+            targets = []
+            for target in self.trainingSet.label:
+                if target == 1:
+                    targets.append(True)
+                else:
+                    targets.append(False)
+
+            targets = np.array(targets)
+
+            inputs = np.array(self.trainingSet.input)
+            outputs = self.evaluate(inputs)
+
+            errors = []
+
+            for j in range(len(targets)):
+                if outputs[j] == targets[j]:
+                    errors.append(0)
+                elif outputs[j]:
+                    errors.append(1)
+                else:
+                    errors.append(-1)
+
+
+            self.updateWeights(inputs, errors)
+
+            if verbose:
+                validation = self.evaluate(self.validationSet)
+                evaluator = Evaluator()
+                evaluator.printAccuracy(self.validationSet, validation)
+
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -72,8 +101,8 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        # Write your code to do the classification on an input image
-        pass
+        return self.fire(testInstance)
+
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -92,11 +121,20 @@ class Perceptron(Classifier):
             test = self.testSet.input
         # Once you can classify an instance, just use map for all of the test
         # set.
+
+
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        # Write your code to update the weights of the perceptron here
-        pass
+
+        for i in range(len(self.weight)):
+            sum = 0
+            for j in range(len(error)):
+                sum += error[j] * input[j][i]
+            #print sum
+            self.weight[i] -= self.learningRate * sum
+
+
          
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
