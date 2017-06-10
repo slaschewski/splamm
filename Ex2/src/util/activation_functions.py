@@ -20,7 +20,8 @@ class Activation:
     @staticmethod
     def sigmoid(netOutput):
         # Here you have to code the sigmoid function
-        pass
+        # Sigmoid function: sig(x) = 1 / (1 + e ^(-x))
+        return (1 / (1 + exp(-netOutput))) > 0.5
 
     @staticmethod
     def sigmoidPrime(netOutput):

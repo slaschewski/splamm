@@ -8,7 +8,7 @@ Loss functions.
 import numpy as np
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-
+from math import log
 
 class Error:
     """
@@ -87,6 +87,7 @@ class BinaryCrossEntropyError(Error):
         self.errorString = 'bce'
 
     def calculateError(self, target, output):
+        # TODO write loss function
         pass
 
 

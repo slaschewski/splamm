@@ -69,6 +69,7 @@ class Perceptron(Classifier):
             for input, label in zip(self.trainingSet.input,
                                     self.trainingSet.label):
                 output = self.fire(input)
+
                 if output != label:
                     error = loss.calculateError(label, output)
                     self.updateWeights(input, error)

@@ -8,6 +8,7 @@ import numpy as np
 from util.activation_functions import Activation
 from model.classifier import Classifier
 
+
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
@@ -56,6 +57,61 @@ class LogisticRegression(Classifier):
             Print logging messages with validation accuracy if verbose is True.
         """
 
+
+        learned = False
+        iteration = 0
+
+        from util.loss_functions import BinaryCrossEntropyError
+        loss = BinaryCrossEntropyError()
+        first = False
+
+        # grad = [0]
+        grad = np.zeros(len(self.trainingSet.input[0]))
+
+
+        # Train for some epochs if the error is not 0
+        while not learned:
+            # x ist ein Bild bestehend aus einem Label (erster Eintrag) und 784 Pixeln
+            # t ist das Zielergebnis von x (überprüfbar mit dem Label)
+            # o ist der tatsächliche Ergebnis von x
+            # w ist der Gewichtsvektor
+            # Als Aktivierungsfunktion verwenden wir die Sigmoid Funktion
+            # Das Training wird dann beendet, sobald das Fehlerkriterium konvergiert
+
+            totalError = 0
+
+            # iteriere für jede Instanz im Trainingsset x € X
+            for input, label in zip(self.trainingSet.input,
+                                    self.trainingSet.label):
+                # Ermittle Ox = sig(w*x)
+                output = self.fire(input)
+                #if first == False:
+                #    print label
+                #    print output
+                #    first = True
+
+                if output != label:
+                    # Ermittle Fehler AE = tx - ox
+                    error = loss.calculateError(label, output)
+
+                    # Update grad = grad + error + x
+                    grad += error * input
+
+                #print "Error: " + str(error) + " Grad: " + str(grad)
+
+            # update w: w <- w + n*grad
+            self.updateWeights(grad)
+            print "weight: " + str(self.weight)
+
+            iteration += 1
+
+            if verbose:
+                logging.info("Epoch: %i; Error: %i", iteration, -totalError)
+
+            if totalError == 0 or iteration >= self.epochs:
+                # stop criteria is reached
+                learned = True
+
         pass
         
     def classify(self, testInstance):
@@ -70,7 +126,7 @@ class LogisticRegression(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        pass
+        return self.fire(testInstance)
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -92,6 +148,7 @@ class LogisticRegression(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, grad):
+        self.weight += self.learningRate * grad
         pass
 
     def fire(self, input):
