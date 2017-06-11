@@ -61,9 +61,9 @@ class LogisticRegression(Classifier):
         learned = False
         iteration = 0
 
-        from util.loss_functions import BinaryCrossEntropyError
-        loss = BinaryCrossEntropyError()
-        first = False
+        from util.loss_functions import DifferentError
+        loss = DifferentError()
+
 
         # grad = [0]
         grad = np.zeros(len(self.trainingSet.input[0]))
@@ -80,33 +80,36 @@ class LogisticRegression(Classifier):
 
             totalError = 0
 
+            output = []
+            labels = self.trainingSet.label
+            inputs = self.trainingSet.input
+
             # iteriere für jede Instanz im Trainingsset x € X
-            for input, label in zip(self.trainingSet.input,
-                                    self.trainingSet.label):
+            for input, label in zip(inputs,
+                                    labels):
                 # Ermittle Ox = sig(w*x)
-                output = self.fire(input)
-                #if first == False:
-                #    print label
-                #    print output
-                #    first = True
+                output.append(self.fire(input))
 
-                if output != label:
-                    # Ermittle Fehler AE = tx - ox
-                    error = loss.calculateError(label, output)
+            # Ermittle Fehler AE = tx - ox
+            error = loss.calculateError(np.array(labels), np.array(output))
 
-                    # Update grad = grad + error + x
-                    grad += error * input
+            print error
+            for e ,input in zip(error, inputs):
+                grad += np.multiply( input, e)
+                # Update grad = grad + error * x
 
-                #print "Error: " + str(error) + " Grad: " + str(grad)
+
+            #print "Error: " + str(error) + " Grad: " + str(grad)
 
             # update w: w <- w + n*grad
             self.updateWeights(grad)
-            print "weight: " + str(self.weight)
+
 
             iteration += 1
+            totalError = error.sum()
 
             if verbose:
-                logging.info("Epoch: %i; Error: %i", iteration, -totalError)
+                logging.info("Epoch: %i; Error: %i", iteration, totalError)
 
             if totalError == 0 or iteration >= self.epochs:
                 # stop criteria is reached
