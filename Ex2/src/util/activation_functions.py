@@ -12,6 +12,16 @@ class Activation:
     """
     Containing various activation functions and their derivatives
     """
+    @staticmethod
+    def id(netOutput, threshold=0):
+        return netOutput
+
+    @staticmethod
+    def idPrime(netOutput):
+        # Here you have to code the sigmoid function
+        # Sigmoid function: sig(x) = 1 / (1 + e ^(-x))
+        return 1
+
 
     @staticmethod
     def sign(netOutput, threshold=0):
@@ -21,14 +31,13 @@ class Activation:
     def sigmoid(netOutput):
         # Here you have to code the sigmoid function
         # Sigmoid function: sig(x) = 1 / (1 + e ^(-x))
-        return (1 / (1 + exp(-netOutput))) > 0.5
+        return (1 / (1 + exp(-netOutput)))
 
     @staticmethod
     def sigmoidPrime(netOutput):
         # Here you have to code the derivative of sigmoid function
         # netOutput.*(1-netOutput)
-        return np.multiply(netOutput, np.ones(len(netOutput)) - netOutput)
-        pass
+        return Activation.sigmoid(netOutput)*( 1 - Activation.sigmoid(netOutput))
 
     @staticmethod
     def tanh(netOutput):
@@ -38,7 +47,7 @@ class Activation:
     @staticmethod
     def tanhPrime(netOutput):
         # Here you have to code the derivative of tanh function
-        return 2 / (np.cosh(2 * netOutput ) + 1)
+        return 1-np.tanh(netOutput)**2
 
     @staticmethod
     def rectified(netOutput):
@@ -73,6 +82,8 @@ class Activation:
             return Activation.sigmoid
         elif str == 'softmax':
             return Activation.softmax
+        elif str == 'id':
+            return Activation.id
         elif str == 'tanh':
             return Activation.tanh
         elif str == 'relu':
@@ -93,6 +104,8 @@ class Activation:
             return Activation.sigmoidPrime
         elif str == 'tanh':
             return Activation.tanhPrime
+        elif str == 'id':
+            return Activation.idPrime
         elif str == 'relu':
             return Activation.rectifiedPrime
         elif str == 'linear':

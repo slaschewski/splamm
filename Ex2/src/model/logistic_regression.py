@@ -13,6 +13,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
                     stream=sys.stdout)
 
+activationName = "sigmoid"
 
 class LogisticRegression(Classifier):
     """
@@ -46,7 +47,13 @@ class LogisticRegression(Classifier):
         self.testSet = test
 
         # Initialize the weight vector with small values
-        self.weight = 0.01*np.random.randn(self.trainingSet.input.shape[1])
+        self.weight = 0.01*np.random.randn(self.trainingSet.input.shape[1]+1)
+
+        print self.trainingSet.input.shape
+        #self.trainingSet =  np.concatenate((np.array(self.trainingSet.input), np.ones(len(self.trainingSet.input),1)), axis=1)
+        self.trainingSet.input = np.insert(self.trainingSet.input, 784, values=1, axis=1)
+        self.validationSet.input = np.insert(self.validationSet.input, 784, values=1, axis=1)
+        self.testSet.input = np.insert(self.testSet.input, 784, values=1, axis=1)
 
     def train(self, verbose=True):
         """Train the Logistic Regression.
@@ -65,8 +72,7 @@ class LogisticRegression(Classifier):
         loss = DifferentError()
 
 
-        # grad = [0]
-        grad = np.zeros(len(self.trainingSet.input[0]))
+
 
 
         # Train for some epochs if the error is not 0
@@ -85,20 +91,27 @@ class LogisticRegression(Classifier):
             inputs = self.trainingSet.input
 
             # iteriere für jede Instanz im Trainingsset x € X
-            for input, label in zip(inputs,
-                                    labels):
-                # Ermittle Ox = sig(w*x)
+            for input in inputs:
+                # Ermittle O_x = sig(w*x)
                 output.append(self.fire(input))
 
             # Ermittle Fehler AE = tx - ox
             error = loss.calculateError(np.array(labels), np.array(output))
 
-            print error
-            for e ,input in zip(error, inputs):
+              # grad = [0]
+            grad = np.zeros(len(self.trainingSet.input[0]))
+            grad2 = np.zeros(len(self.trainingSet.input[0]))
+
+            for e, input, out in zip(error, inputs, output):
+                activationPrime = Activation.getDerivative(activationName)(np.dot(np.array(input), self.weight))
+                #grad +=  np.multiply( np.multiply( input, e), activationPrime)
                 grad += np.multiply( input, e)
-                # Update grad = grad + error * x
+
+                # Update grad = grad + errorPrime * x * activationPrime
 
 
+
+            # print grad - grad2
             #print "Error: " + str(error) + " Grad: " + str(grad)
 
             # update w: w <- w + n*grad
@@ -111,7 +124,7 @@ class LogisticRegression(Classifier):
             if verbose:
                 logging.info("Epoch: %i; Error: %i", iteration, totalError)
 
-            if totalError == 0 or iteration >= self.epochs:
+            if abs(totalError) < 0.01 or iteration >= self.epochs:
                 # stop criteria is reached
                 learned = True
 
@@ -129,7 +142,7 @@ class LogisticRegression(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        return self.fire(testInstance)
+        return self.fire(testInstance) > 0.5
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -155,6 +168,5 @@ class LogisticRegression(Classifier):
         pass
 
     def fire(self, input):
-        # Look at how we change the activation function here!!!!
-        # Not Activation.sign as in the perceptron, but sigmoid
-        return Activation.sigmoid(np.dot(np.array(input), self.weight))
+        return Activation.getActivation(activationName)(np.dot(np.array(input), self.weight))
+       # return Activation.sigmoid(np.dot(np.array(input), self.weight))

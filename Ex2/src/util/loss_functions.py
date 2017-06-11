@@ -35,7 +35,7 @@ class AbsoluteError(Error):
 
     def calculateError(self, target, output):
         # It is the numbers of differences between target and output
-        return abs(target - output)
+        return abs( target - output)
 
 
 class DifferentError(Error):
@@ -87,8 +87,7 @@ class BinaryCrossEntropyError(Error):
         self.errorString = 'bce'
 
     def calculateError(self, target, output):
-        # TODO write loss function
-        pass
+        return -np.sum(target * np.log(output) + (np.ones(len(target)) - target) * np.log(np.ones(len(output)) - output))
 
 
 class CrossEntropyError(Error):
@@ -100,4 +99,5 @@ class CrossEntropyError(Error):
         self.errorString = 'crossentropy'
 
     def calculateError(self, target, output):
-        pass
+        return -np.sum(target * np.log(output) + (np.ones(len(target)) - target) * np.log(np.ones(len(output)) - output))
+
