@@ -45,7 +45,7 @@ class Activation:
 
     @staticmethod
     def rectifiedPrime(netOutput):
-        # Here you have to code the derivative of rectified linear function
+        # Heaviside function
         return netOutput >= 0.0
 
     @staticmethod
