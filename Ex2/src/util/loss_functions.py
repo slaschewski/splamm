@@ -88,7 +88,7 @@ class BinaryCrossEntropyError(Error):
 
     def calculateError(self, target, output):
         # TODO write loss function
-        pass
+        return (-(target - output))
 
 
 class CrossEntropyError(Error):

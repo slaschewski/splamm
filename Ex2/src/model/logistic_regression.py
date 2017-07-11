@@ -101,6 +101,8 @@ class LogisticRegression(Classifier):
 
             # update w: w <- w + n*grad
             self.updateWeights(grad)
+
+            totalError += error
             print "weight: " + str(self.weight)
 
             iteration += 1
