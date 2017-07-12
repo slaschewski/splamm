@@ -125,5 +125,6 @@ class LogisticRegression(Classifier):
     def updateWeights(self, grad):
         self.weight -= self.learningRate*grad
 
+
     def fire(self, input):
         return Activation.sigmoid(np.dot(np.array(input), self.weight))
