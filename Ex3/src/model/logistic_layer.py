@@ -4,10 +4,10 @@ import time
 import numpy as np
 
 from util.activation_functions import Activation
-from model.layer import Layer
 
 
-class LogisticLayer(Layer):
+
+class LogisticLayer():
     """
     A layer of perceptrons acting as the output layer
 
@@ -47,6 +47,7 @@ class LogisticLayer(Layer):
         # Notice the functional programming paradigms of Python + Numpy
         self.activationString = activation
         self.activation = Activation.getActivation(self.activationString)
+        self.actDerivative = Activation.getDerivative(self.activationString)
 
         self.nIn = nIn
         self.nOut = nOut
@@ -84,7 +85,8 @@ class LogisticLayer(Layer):
         ndarray :
             a numpy array (1,nOut) containing the output of the layer
         """
-        pass
+        return self.activation(np.matmul(self.weights,input))
+
 
     def computeDerivative(self, nextDerivatives, nextWeights):
         """
@@ -102,10 +104,21 @@ class LogisticLayer(Layer):
         ndarray :
             a numpy array containing the partial derivatives on this layer
         """
-        pass
+        return np.sum(np.multiply(nextWeights,nextDerivatives))
 
-    def updateWeights(self):
+
+
+    def updateWeights(self, inputs, derivatives, learningRate):
         """
         Update the weights of the layer
         """
-        pass
+        inputs = np.insert(inputs,0,1)
+        neuron_activation_grad = self.actDerivative(np.matmul(self.weights, inputs))
+        if  len(inputs.shape) == 1:
+            inputs =inputs.reshape(inputs.shape[0],1)
+        if len(derivatives.shape) == 1:
+            derivatives = derivatives.reshape(derivatives.shape[0],1)
+            print(derivatives)
+        update = -np.matmul(inputs,np.transpose(neuron_activation_grad*derivatives))
+        print(self.weights)
+        self.weights -= learningRate*np.transpose(update)

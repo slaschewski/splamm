@@ -7,6 +7,7 @@ import numpy as np
 
 from util.activation_functions import Activation
 from model.classifier import Classifier
+from model.logistic_layer import LogisticLayer
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -44,8 +45,11 @@ class LogisticRegression(Classifier):
         self.validationSet = valid
         self.testSet = test
 
-        # Initialize the weight vector with small values
-        self.weight = 0.01*np.random.randn(self.trainingSet.input.shape[1])
+        nHiddenNeurons = 10
+
+        self.layers = [LogisticLayer(self.trainingSet.input.shape[1],nHiddenNeurons,activation='sigmoid', isClassifierLayer=False)]
+        self.layers.append(LogisticLayer(nHiddenNeurons, 1, activation='sigmoid'))
+
 
     def train(self, verbose=True):
         """Train the Logistic Regression.
@@ -65,11 +69,26 @@ class LogisticRegression(Classifier):
         while not learned:
             grad = 0
             totalError = 0
+
+
             for input, label in zip(self.trainingSet.input,
                                     self.trainingSet.label):
-                output = self.fire(input)
+
+                output = [input]
+                for layer in self.layers:
+                    input_next = np.insert(output[-1],0,1)
+                    output.append(layer.forward(input_next))
                 # compute gradient
-                grad += -(label - output)*input
+
+                layer = self.layers[-1]
+                grad = (label-output.pop())
+                layer.updateWeights(output.pop(), grad, self.learningRate)
+                weights = layer.weights
+
+                for layer in reversed(self.layers[:-1]):
+                    grad = layer.computeDerivative(grad, weights)
+                    layer.updateWeights(output.pop(),grad,self.learningRate)
+                    weights = layer.weights
 
                 # compute recognizing error, not BCE
                 predictedLabel = self.classify(input)
@@ -101,7 +120,14 @@ class LogisticRegression(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        return self.fire(testInstance) > 0.5
+        for input, label in zip(self.trainingSet.input,
+                                self.trainingSet.label):
+
+            output = input
+            for layer in self.layers:
+                output=layer.forward(output)
+                # compute gradient
+        return output > 0.5
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -122,9 +148,6 @@ class LogisticRegression(Classifier):
         # set.
         return list(map(self.classify, test))
 
-    def updateWeights(self, grad):
-        self.weight -= self.learningRate*grad
 
 
-    def fire(self, input):
-        return Activation.sigmoid(np.dot(np.array(input), self.weight))
+
