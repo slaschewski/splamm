@@ -70,11 +70,11 @@ class LogisticRegression(Classifier):
             grad = 0
             totalError = 0
 
-
             for input, label in zip(self.trainingSet.input,
                                     self.trainingSet.label):
 
                 output = [input]
+
                 for layer in self.layers:
                     input_next = np.insert(output[-1],0,1)
                     output.append(layer.forward(input_next))
@@ -91,14 +91,12 @@ class LogisticRegression(Classifier):
                     weights = layer.weights
 
                 # compute recognizing error, not BCE
-                predictedLabel = self.classify(input)
+                predictedLabel = self.forward(input)
                 error = loss.calculateError(label, predictedLabel)
                 totalError += error
 
-            print("1")
-            self.updateWeights(grad)
+            # self.updateWeights(grad)
             totalError = abs(totalError)
-            print("2")
             
             iteration += 1
 
@@ -122,14 +120,21 @@ class LogisticRegression(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        for input, label in zip(self.trainingSet.input,
-                                self.trainingSet.label):
+        # for input, label in zip(self.trainingSet.input,
+        #                        self.trainingSet.label):
 
-            output = np.insert(input, 0, 1)
-            for layer in self.layers:
-                output=layer.forward(output)
+        #     output = np.insert(input, 0, 1)
+        #     for layer in self.layers:
+        #         output=layer.forward(output)
                 # compute gradient
-        return output > 0.5
+
+        return self.forward(testInstance) > 0.5
+
+    def forward(self, testInstance):
+        output = np.insert(testInstance, 0, 1)
+        for layer in self.layers:
+            output = layer.forward(output)
+        return output
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
