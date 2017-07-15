@@ -118,7 +118,7 @@ class LogisticLayer():
             inputs =inputs.reshape(inputs.shape[0],1)
         if len(derivatives.shape) == 1:
             derivatives = derivatives.reshape(derivatives.shape[0],1)
-            print(derivatives)
+            # print(derivatives)
         update = -np.matmul(inputs,np.transpose(neuron_activation_grad*derivatives))
-        print(self.weights)
+        # print(self.weights)
         self.weights -= learningRate*np.transpose(update)

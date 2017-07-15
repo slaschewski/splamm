@@ -45,10 +45,10 @@ class LogisticRegression(Classifier):
         self.validationSet = valid
         self.testSet = test
 
-        nHiddenNeurons = 10
+        nHiddenNeurons = 1
 
-        self.layers = [LogisticLayer(self.trainingSet.input.shape[1],nHiddenNeurons,activation='sigmoid', isClassifierLayer=False)]
-        self.layers.append(LogisticLayer(nHiddenNeurons, 1, activation='sigmoid'))
+        self.layers = [LogisticLayer(self.trainingSet.input.shape[1],nHiddenNeurons,activation='sigmoid', isClassifierLayer=True)]
+        # self.layers.append(LogisticLayer(nHiddenNeurons, 1, activation='sigmoid'))
 
 
     def train(self, verbose=True):
@@ -95,8 +95,10 @@ class LogisticRegression(Classifier):
                 error = loss.calculateError(label, predictedLabel)
                 totalError += error
 
+            print("1")
             self.updateWeights(grad)
             totalError = abs(totalError)
+            print("2")
             
             iteration += 1
 
@@ -123,7 +125,7 @@ class LogisticRegression(Classifier):
         for input, label in zip(self.trainingSet.input,
                                 self.trainingSet.label):
 
-            output = input
+            output = np.insert(input, 0, 1)
             for layer in self.layers:
                 output=layer.forward(output)
                 # compute gradient
