@@ -72,16 +72,18 @@ class MultilayerPerceptron(Classifier):
         # Build up the network from specific layers
         self.layers = []
 
+        self.numHidden = 40
+
         # Input layer
         inputActivation = "sigmoid"
         self.layers.append(LogisticLayer(train.input.shape[1], 128, 
                            None, inputActivation, False))
 
-        self.layers.append(LogisticLayer(128,100, None, "sigmoid", False))
+        self.layers.append(LogisticLayer(128, self.numHidden, None, "sigmoid", False))
 
         # Output layer
         outputActivation = "softmax"
-        self.layers.append(LogisticLayer(100, 10, 
+        self.layers.append(LogisticLayer(self.numHidden, 10,
                            None, outputActivation, True))
 
         self.inputWeights = inputWeights
@@ -154,9 +156,14 @@ class MultilayerPerceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
+
         for epoch in range(self.epochs):
+            i = 0
             for img, label in zip(self.trainingSet.input,
                                 self.trainingSet.label):
+
+                #print(i)
+                i += 1
 
                 label_vec = np.zeros([10])
                 label_vec[label] = 1
@@ -173,36 +180,49 @@ class MultilayerPerceptron(Classifier):
                 error = self._compute_error(label, output)
 
                 nextWeights = np.ones(self.layers[-1].nOut)
-                nextDev = error
+
+
+                lossDerivative = self.loss.calculateDerivative(label, output)
+                nextDev = lossDerivative
+
                 #print("--")
+
+
+
                 for layer in reversed(self.layers):
                     #print("Dev " + str(nextDev))
+                    #print(layer.outp)
+                    #print(len(layer.outp))
+                    '''nextDev = np.multiply(self.loss.calculateDerivative(label, layer.outp),
+                                          layer.computeDerivative(nextDev, nextWeights))'''
                     nextDev = layer.computeDerivative(nextDev, nextWeights)
                     nextWeights = np.transpose(layer.weights[1:])
                     #print("weights " + str(nextWeights))
 
+
+                '''for layer in self.layers:
+                    print(layer.weights)
+                    print(layer.deltas)
+                    print(layer.outp)
+
+                print(label)'''
+
                 # Update weights in the online learning fashion
                 self._update_weights(self.learningRate)
 
-                '''if verbose:
-                    accuracy = accuracy_score(self.validationSet.label,
-                                              self._feed_forward(self.validationSet))
-                    # Record the performance of each epoch for later usages
-                    # e.g. plotting, reporting..
-                    self.performances.append(accuracy)
-                    print("Accuracy on validation: {0:.2f}%"
-                          .format(accuracy * 100))
-                    print("-----------------------------")'''
+            if verbose:
+                print("Training epoch {0}/{1}.."
+                      .format(epoch + 1, self.epochs))
 
-            print(epoch)
-
-
-            '''Break condition'''
-            if False:
-                break
-                
-
-
+            if verbose:
+                accuracy = accuracy_score(self.validationSet.label,
+                                          list(map(self.classify, self.validationSet)))
+                # Record the performance of each epoch for later usages
+                # e.g. plotting, reporting..
+                self.performances.append(accuracy)
+                print("Accuracy on validation: {0:.2f}%"
+                      .format(accuracy * 100))
+                print("-----------------------------")
 
 
 
@@ -210,7 +230,7 @@ class MultilayerPerceptron(Classifier):
         # Classify an instance given the model of the classifier
         # You need to implement something here
         outp = self._feed_forward(test_instance)
-        print(outp)
+        #print(outp)
         return np.argmax(outp)
         
 

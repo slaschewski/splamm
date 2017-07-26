@@ -70,7 +70,7 @@ class Activation:
     @staticmethod
     def softmaxPrime(netOutput):
         # Here you have to code the softmax function
-        return Activation.softmax(netOutput) * (1 - Activation.softmax(netOutput))
+        return netOutput * (1 - netOutput)
         
     @staticmethod
     def getActivation(str):

@@ -34,8 +34,9 @@ def main():
     myMLPClassifier = MultilayerPerceptron(data.trainingSet,
                                            data.validationSet,
                                            data.testSet,
-                                           learningRate=0.005,
-                                           epochs=3)
+                                           loss = 'bce',
+                                           learningRate=0.1,
+                                           epochs=30)
                                         
     
     # Report the result #
@@ -94,6 +95,9 @@ def main():
     # plot.draw_performance_epoch(myLRClassifier.performances,
     #                             myLRClassifier.epochs)
 
+    '''plot = PerformancePlot("Mulit Layer Perceptron validation")
+    plot.draw_performance_epoch(myMLPClassifier.performances,
+                                myMLPClassifier.epochs)'''
 
     
     
